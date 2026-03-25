@@ -1,0 +1,6 @@
+.env
+ai-video-generator/
+__pycache__/
+assets/
+output/
+.DS_Store
