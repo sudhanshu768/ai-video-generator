@@ -1,16 +1,16 @@
 # 🎬 AI Video Generator
 
-An automated pipeline that converts a simple idea into a complete video using AI — including script generation, voice narration, and video creation.
+An end-to-end AI pipeline that converts a simple idea into a cinematic video using multiple AI services — including script generation, image synthesis, voice narration, and video rendering.
 
 ---
 
 ## 🚀 Features
 
-* 🧠 Script generation using local LLM
-* 🎤 Voice narration generation
-* 🖼️ Scene-based video creation
-* 🎥 Automated video rendering
-* ⚡ End-to-end pipeline (idea → video)
+* 🧠 **AI Script Generation** (OpenRouter API)
+* 🎨 **AI Image Generation** (Hugging Face – Stable Diffusion XL)
+* 🎤 **Text-to-Speech Narration** (gTTS)
+* 🎥 **Automated Video Creation** (MoviePy + FFmpeg)
+* ⚡ Fully automated pipeline (idea → video)
 
 ---
 
@@ -19,51 +19,49 @@ An automated pipeline that converts a simple idea into a complete video using AI
 ```
 User Input
    ↓
-Ollama (Script + Scenes)
+OpenRouter API (Script Generation)
    ↓
-Image Generation (Placeholder)
+Scene Processing + Prompt Engineering
    ↓
-Text-to-Speech (gTTS)
+Hugging Face API (Image Generation)
    ↓
-MoviePy + FFmpeg
+gTTS (Audio Narration)
    ↓
-Final Video 🎬
+MoviePy + FFmpeg (Video Creation)
+   ↓
+Final Output 🎬
 ```
 
 ---
 
 ## 🔌 APIs & Tools Used
 
-This project was designed with a **cost-optimized approach**, minimizing paid API usage.
+### ✅ APIs Used in Final Output
 
-### ✅ APIs / Tools Used in Final Output
-
-| Component         | Tool Used        | Type           | Status |
-| ----------------- | ---------------- | -------------- | ------ |
-| Script Generation | Ollama (Mistral) | Local LLM      | ✅ Used |
-| Text-to-Speech    | gTTS             | Free API       | ✅ Used |
-| Video Creation    | MoviePy          | Python Library | ✅ Used |
-| Video Processing  | FFmpeg           | Local Tool     | ✅ Used |
-
----
-
-### ⚠️ APIs Considered (Not Used in Final Version)
-
-| Component         | Tool          | Reason                  |
-| ----------------- | ------------- | ----------------------- |
-| Script Generation | OpenAI API    | Paid / cost constraints |
-| Image Generation  | DALL·E        | Paid                    |
-| Video Generation  | Runway / Pika | Expensive APIs          |
-| Voice Generation  | ElevenLabs    | Paid                    |
+| Component         | Tool                               | Type                | Status |
+| ----------------- | ---------------------------------- | ------------------- | ------ |
+| Script Generation | OpenRouter API                     | LLM API             | ✅ Used |
+| Image Generation  | Hugging Face (Stable Diffusion XL) | Diffusion Model API | ✅ Used |
+| Text-to-Speech    | gTTS                               | Free API            | ✅ Used |
+| Video Creation    | MoviePy                            | Python Library      | ✅ Used |
+| Video Processing  | FFmpeg                             | Local Tool          | ✅ Used |
 
 ---
 
-### 💡 Design Philosophy
+### 🧪 Engineering Notes
 
-* ❌ Avoid expensive APIs
-* ✅ Prefer local models
-* ✅ Build fully offline-capable pipeline
-* ⚡ Optimize for scalability and cost
+* Uses **OpenRouter (`openrouter/auto`)** for flexible model selection
+* Uses **Stable Diffusion XL (SDXL)** via Hugging Face for high-quality images
+* Combines **scene-level prompts → image synthesis → timed video clips**
+* Fully automated pipeline with minimal manual intervention
+
+---
+
+### 🔐 Security & API Handling
+
+* API keys stored using `.env` file
+* `.env` excluded via `.gitignore`
+* Sensitive tokens are **not committed to repository**
 
 ---
 
@@ -72,23 +70,20 @@ This project was designed with a **cost-optimized approach**, minimizing paid AP
 ```
 ai-video-generator/
 │
-├── main.py
-├── gpt_module.py
-├── audio_module.py
-├── video_module.py
+├── main.py              # Main pipeline controller
+├── gpt_module.py        # Script generation (OpenRouter)
+├── image_module.py      # Image generation (Hugging Face)
+├── audio_module.py      # Voice generation (gTTS)
+├── video_module.py      # Video rendering
 │
-├── assets/
-│   ├── images/
-│   ├── audio/
-│
-└── output/
+└── output.mp4           # Final generated video
 ```
 
 ---
 
 ## ⚙️ Setup
 
-### 1. Clone repository
+### 1. Clone Repository
 
 ```
 git clone https://github.com/YOUR_USERNAME/ai-video-generator.git
@@ -97,7 +92,7 @@ cd ai-video-generator
 
 ---
 
-### 2. Create virtual environment
+### 2. Create Virtual Environment
 
 ```
 python3 -m venv ai-video-generator
@@ -106,71 +101,96 @@ source ai-video-generator/bin/activate
 
 ---
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```
-pip install moviepy gtts pillow ollama
+pip install requests python-dotenv gtts moviepy pillow huggingface_hub tqdm
 ```
 
 ---
 
-### 4. Start Ollama
+### 4. Setup Environment Variables
+
+Create a `.env` file:
 
 ```
-ollama pull mistral
-ollama serve
+OPENROUTER_API_KEY=your_openrouter_api_key
+HF_TOKEN=your_huggingface_token
 ```
 
 ---
 
 ## ▶️ Usage
 
+Run the project:
+
 ```
 python main.py
 ```
 
-Example input:
+Enter a prompt:
 
 ```
-"Impact of AI on future jobs"
+"AI discovering human emotions"
 ```
 
 ---
 
 ## 🎬 Output
 
-Final video:
+* Final video saved as:
 
 ```
-output/final.mp4
+output.mp4
 ```
 
 ---
 
-## 🧠 Tech Stack
+## 🧠 How It Works
 
-* Python
-* Ollama (Mistral)
-* MoviePy
-* FFmpeg
-* gTTS
+### 1. Script Generation
+
+* Uses OpenRouter API to generate a cinematic multi-scene script
+
+### 2. Scene Processing
+
+* Splits script into scenes
+* Cleans text for narration
+* Generates image prompts
+
+### 3. Image Generation
+
+* Uses Stable Diffusion XL via Hugging Face
+* Generates one image per scene
+
+### 4. Audio Generation
+
+* Converts full script into narration using gTTS
+
+### 5. Video Creation
+
+* Combines images into clips
+* Matches durations based on scene length
+* Merges with audio using MoviePy
 
 ---
 
-## 🔐 Security Note
+## ⚡ Key Features
 
-* `.env` files are excluded using `.gitignore`
-* No API keys are stored in the repository
+* Scene-based storytelling pipeline
+* Automatic duration estimation
+* Prompt engineering for better visuals
+* Modular architecture (easy to extend)
 
 ---
 
 ## 🚀 Future Improvements
 
-* Stable Diffusion for real images
-* Whisper for subtitles
-* Coqui TTS for better voice
-* Scene transitions & animations
-* YouTube auto-upload
+* Add subtitles (Whisper)
+* Replace gTTS with neural TTS (Coqui / ElevenLabs)
+* Add transitions & animations
+* Improve prompt engineering
+* Add YouTube auto-upload
 
 ---
 
